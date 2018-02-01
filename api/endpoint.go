@@ -10,11 +10,23 @@ type RequestStuct struct {
 	RequestString string `json:"word"`
 }
 
-func LoadDefaultConfigs(w http.ResponseWriter, r *http.Request) {
-	FilesReader()
-	WriteKVsToConsul()
+var kvStruct = &KeyValue{kv: make(map[string]string)}
 
-	fmt.Println("Configuration Loaded.")
+func LoadDefaultConfigs(w http.ResponseWriter, r *http.Request) {
+	fileType := r.URL.Query().Get("type")
+
+	if fileType == "yaml" {
+		kvStruct.FileReader("yaml")
+	}
+	if fileType == "properties" {
+		kvStruct.FileReader("properties")
+	}
+
+	nil := kvStruct.WriteKVsToConsul()
+
+	if nil != nil {
+		fmt.Println("Configuration Loaded.")
+	}
 
 	req := RequestStuct{RequestString: "Configuration read and default Key Values loaded to Consul"}
 	json.NewEncoder(w).Encode(req)
