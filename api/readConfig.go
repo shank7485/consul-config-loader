@@ -10,7 +10,6 @@ type KeyValue struct {
 	kv map[string]string
 }
 
-
 func (kvStruct *KeyValue) FileReader(typ string) {
 	if typ == "yaml" {
 		defer kvStruct.Unlock()
