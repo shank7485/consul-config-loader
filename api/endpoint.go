@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -22,13 +21,14 @@ func LoadDefaultConfigs(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		nil := kvStruct.WriteKVsToConsul()
-		if nil != nil {
-			fmt.Println("Configuration Loaded.")
+		err := kvStruct.WriteKVsToConsul()
+		if err != nil {
+			req := RequestStuct{RequestString: string(err.Error())}
+			json.NewEncoder(w).Encode(req)
+		} else {
+			req := RequestStuct{RequestString: "Configuration read and default Key Values loaded to Consul"}
+			json.NewEncoder(w).Encode(req)
 		}
-
-		req := RequestStuct{RequestString: "Configuration read and default Key Values loaded to Consul"}
-		json.NewEncoder(w).Encode(req)
 	}
 
 	if getQueries, ok := query["get"]; ok {
@@ -37,9 +37,10 @@ func LoadDefaultConfigs(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				req := RequestStuct{RequestString: string(err.Error())}
 				json.NewEncoder(w).Encode(req)
+			} else {
+				req := RequestStuct{RequestString: "key: " + key + ", value: " + value}
+				json.NewEncoder(w).Encode(req)
 			}
-			req := RequestStuct{RequestString: "key: " + key + ", value: " + value}
-			json.NewEncoder(w).Encode(req)
 		}
 	}
 

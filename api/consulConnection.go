@@ -1,14 +1,19 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/consul/api"
+	"os"
 )
 
 func (kvStruct *KeyValue) WriteKVsToConsul() error {
 	for key, value := range kvStruct.kv {
-		// Add logic to add KVs to Consul
-		requestPUT("127.0.0.1", key, value)
+		// requestPUT("127.0.0.1", key, value)
+		if os.Getenv("CONSUL_IP") == "" {
+			return errors.New("CONSUL_IP environment variable not set.")
+		}
+		requestPUT(os.Getenv("CONSUL_IP"), key, value)
 		fmt.Println("key:", key, "value", value)
 	}
 	fmt.Println("Wrote KVs to Consul")
@@ -16,7 +21,10 @@ func (kvStruct *KeyValue) WriteKVsToConsul() error {
 }
 
 func GetKVsFromConsul(key string) (string, error) {
-	resp, err := requestGET("127.0.0.1", key)
+	if os.Getenv("CONSUL_IP") == "" {
+		return "", errors.New("CONSUL_IP environment variable not set.")
+	}
+	resp, err := requestGET(os.Getenv("CONSUL_IP"), key)
 	return resp, err
 }
 
