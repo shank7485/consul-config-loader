@@ -15,8 +15,9 @@ func (kvStruct *KeyValue) WriteKVsToConsul() error {
 	return nil
 }
 
-func GetKVsFromConsul(key string) string {
-	return requestGET("127.0.0.1", key)
+func GetKVsFromConsul(key string) (string, error) {
+	resp, err := requestGET("127.0.0.1", key)
+	return resp, err
 }
 
 func requestPUT(url string, key string, value string) {
@@ -37,20 +38,18 @@ func requestPUT(url string, key string, value string) {
 	}
 }
 
-func requestGET(url string, key string) string {
+func requestGET(url string, key string) (string, error) {
 	config := api.DefaultConfig()
 	config.Address = url + ":8500"
 	client, err := api.NewClient(config)
 
-	if err != nil {
-		panic(err)
-	}
-
 	kv := client.KV()
 
 	pair, _, err := kv.Get(key, nil)
-	if err != nil {
-		panic(err)
+
+	if pair == nil {
+		return string("No value found for key."), err
 	}
-	return string(pair.Value)
+	return string(pair.Value), err
+
 }

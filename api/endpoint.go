@@ -2,13 +2,12 @@ package api
 
 import (
 	"encoding/json"
-	//"fmt"
 	"fmt"
 	"net/http"
 )
 
 type RequestStuct struct {
-	RequestString string `json:"word"`
+	RequestString string `json:"response"`
 }
 
 var kvStruct = &KeyValue{kv: make(map[string]string)}
@@ -18,9 +17,6 @@ func LoadDefaultConfigs(w http.ResponseWriter, r *http.Request) {
 
 	if fileTypes, ok := query["type"]; ok {
 		for _, file := range fileTypes {
-			if file == "yaml" {
-				kvStruct.FileReader("yaml")
-			}
 			if file == "properties" {
 				kvStruct.FileReader("properties")
 			}
@@ -36,9 +32,13 @@ func LoadDefaultConfigs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if getQueries, ok := query["get"]; ok {
-		for _, getReq := range getQueries {
-			value := GetKVsFromConsul(getReq)
-			req := RequestStuct{RequestString: value}
+		for _, key := range getQueries {
+			value, err := GetKVsFromConsul(key)
+			if err != nil {
+				req := RequestStuct{RequestString: string(err.Error())}
+				json.NewEncoder(w).Encode(req)
+			}
+			req := RequestStuct{RequestString: "key: " + key + ", value: " + value}
 			json.NewEncoder(w).Encode(req)
 		}
 	}
