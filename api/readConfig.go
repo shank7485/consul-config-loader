@@ -10,11 +10,18 @@ type KeyValue struct {
 }
 
 func (kvStruct *KeyValue) FileReader(typ string) {
-	if typ == "properties" {
-		defer kvStruct.Unlock()
-		kvStruct.Lock()
+	defer kvStruct.Unlock()
 
-		propertiesValues := PropertiesToKV()
+	kvStruct.Lock()
+
+	if typ == "default" {
+		propertiesValues := PropertiesToKV("default")
+		for key, value := range propertiesValues {
+			kvStruct.kv[key] = value
+		}
+	} else {
+		// Pass directory.
+		propertiesValues := PropertiesToKV("default")
 		for key, value := range propertiesValues {
 			kvStruct.kv[key] = value
 		}

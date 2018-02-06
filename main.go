@@ -9,6 +9,9 @@ import (
 
 func main() {
 	router := mux.NewRouter()
-	router.HandleFunc("/", api.LoadDefaultConfigs).Methods("GET")
+	router.HandleFunc("/loadconfigs", api.HandlePOST).Methods("POST")
+	router.HandleFunc("/getconfig/{key}", api.HandleGET).Methods("GET")
+	router.HandleFunc("/getconfigs", api.HandleGETS).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
+
 }

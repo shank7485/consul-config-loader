@@ -7,18 +7,33 @@ import (
 	"runtime"
 )
 
-func PropertiesToKV() map[string]string {
-	kvs := make(map[string]string)
+func PropertiesToKV(directory string) map[string]string {
+	if directory == "default" {
+		kvs := make(map[string]string)
 
-	_, filename, _, ok := runtime.Caller(0)
+		_, filename, _, ok := runtime.Caller(0)
 
-	if !ok {
-		panic("No caller information")
+		if !ok {
+			panic("No caller information")
+		}
+
+		configDir := path.Dir(filename) + "/../configurations/"
+		ReadMultipleProperties(configDir, kvs)
+		return kvs
+	} else {
+		// Add case if directory is not there.
+		kvs := make(map[string]string)
+
+		_, filename, _, ok := runtime.Caller(0)
+
+		if !ok {
+			panic("No caller information")
+		}
+
+		configDir := path.Dir(filename) + "/../configurations/"
+		ReadMultipleProperties(configDir, kvs)
+		return kvs
 	}
-
-	configDir := path.Dir(filename) + "/../configurations/"
-	ReadMultipleProperties(configDir, kvs)
-	return kvs
 }
 
 func ReadProperty(path string, kvs map[string]string) {
