@@ -9,11 +9,13 @@ import (
 
 func (kvStruct *KeyValue) WriteKVsToConsul() error {
 	for key, value := range kvStruct.kv {
-		// requestPUT("127.0.0.1", key, value)
 		if os.Getenv("CONSUL_IP") == "" {
 			return errors.New("CONSUL_IP environment variable not set.")
 		}
-		requestPUT(os.Getenv("CONSUL_IP"), key, value)
+		err := requestPUT(os.Getenv("CONSUL_IP"), key, value)
+		if err != nil {
+			return err
+		}
 		fmt.Println("key:", key, "value", value)
 	}
 	fmt.Println("Wrote KVs to Consul")
@@ -36,13 +38,13 @@ func GetKVsFromConsul() ([]string, error) {
 	return resp, err
 }
 
-func requestPUT(url string, key string, value string) {
+func requestPUT(url string, key string, value string) error {
 	config := api.DefaultConfig()
 	config.Address = url + ":8500"
 	client, err := api.NewClient(config)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	kv := client.KV()
@@ -50,8 +52,10 @@ func requestPUT(url string, key string, value string) {
 	p := &api.KVPair{Key: key, Value: []byte(value)}
 	_, err = kv.Put(p, nil)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 func requestGET(url string, key string) (string, error) {

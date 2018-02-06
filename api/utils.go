@@ -32,22 +32,29 @@ type TypeStruct struct {
 
 var KVStruct = &KeyValue{kv: make(map[string]string)}
 
-func (kvStruct *KeyValue) FileReader(typ string) {
+func (kvStruct *KeyValue) FileReader(directory string) error {
 	defer kvStruct.Unlock()
 
 	kvStruct.Lock()
 
-	if typ == "default" {
-		propertiesValues := PropertiesToKV("default")
+	if directory == "default" {
+		propertiesValues, err := PropertiesFilesToKV("default")
+		if err != nil {
+			return err
+		}
 		for key, value := range propertiesValues {
 			kvStruct.kv[key] = value
 		}
+		return nil
 	} else {
-		// Pass directory.
-		propertiesValues := PropertiesToKV("default")
+		propertiesValues, err := PropertiesFilesToKV(directory)
+		if err != nil {
+			return err
+		}
 		for key, value := range propertiesValues {
 			kvStruct.kv[key] = value
 		}
+		return nil
 	}
 }
 
@@ -58,18 +65,28 @@ func readBody(body LoadStruct) error {
 	if body.Type.FilePath == "" {
 		return errors.New("file_path not set")
 	} else if body.Type.FilePath == "default" {
-		KVStruct.FileReader("default")
-		err := KVStruct.WriteKVsToConsul()
+		err := KVStruct.FileReader("default")
 		if err != nil {
 			return err
 		}
+
+		err = KVStruct.WriteKVsToConsul()
+		if err != nil {
+			return err
+		}
+
 		return nil
 	} else {
-		KVStruct.FileReader(body.Type.FilePath)
-		err := KVStruct.WriteKVsToConsul()
+		err := KVStruct.FileReader(body.Type.FilePath)
 		if err != nil {
 			return err
 		}
+
+		err = KVStruct.WriteKVsToConsul()
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 }
