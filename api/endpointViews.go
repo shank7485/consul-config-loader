@@ -25,7 +25,7 @@ func HandlePOST(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		req := ResponseStringStruct{Response: string(err.Error())}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(req)
 	} else {
 		req := ResponseStringStruct{Response: "Configuration read and default Key Values loaded to Consul"}

@@ -5,34 +5,34 @@ import (
 	"io/ioutil"
 	"path"
 	"runtime"
+	"errors"
 )
 
-func PropertiesToKV(directory string) map[string]string {
+func PropertiesFilesToKV(directory string) (map[string]string, error){
 	if directory == "default" {
 		kvs := make(map[string]string)
 
 		_, filename, _, ok := runtime.Caller(0)
 
 		if !ok {
-			panic("No caller information")
+			return nil, errors.New("No caller")
 		}
 
 		configDir := path.Dir(filename) + "/../configurations/"
-		ReadMultipleProperties(configDir, kvs)
-		return kvs
+		err := ReadMultipleProperties(configDir, kvs)
+		if err != nil {
+			return nil, err
+		}
+		return kvs, nil
 	} else {
 		// Add case if directory is not there.
 		kvs := make(map[string]string)
-
-		_, filename, _, ok := runtime.Caller(0)
-
-		if !ok {
-			panic("No caller information")
+		directory += "/"
+		err := ReadMultipleProperties(directory, kvs)
+		if err != nil {
+			return nil, err
 		}
-
-		configDir := path.Dir(filename) + "/../configurations/"
-		ReadMultipleProperties(configDir, kvs)
-		return kvs
+		return kvs, nil
 	}
 }
 
@@ -43,13 +43,15 @@ func ReadProperty(path string, kvs map[string]string) {
 	}
 }
 
-func ReadMultipleProperties(path string, kvs map[string]string) {
+func ReadMultipleProperties(path string, kvs map[string]string) (error){
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, f := range files {
-		ReadProperty(path+f.Name(), kvs)
+		ReadProperty(path + f.Name(), kvs)
 	}
+
+	return nil
 }
