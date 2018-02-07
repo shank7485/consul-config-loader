@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+var getkv = GetKVsFromConsul
+
 func HandlePOST(w http.ResponseWriter, r *http.Request) {
 
 	var body LoadStruct
@@ -54,7 +56,7 @@ func HandleGET(w http.ResponseWriter, r *http.Request) {
 
 func HandleGETS(w http.ResponseWriter, r *http.Request) {
 
-	values, err := GetKVsFromConsul()
+	values, err := getkv()
 
 	if err != nil {
 		req := ResponseStringStruct{Response: string(err.Error())}
