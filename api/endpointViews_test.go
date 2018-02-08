@@ -25,8 +25,8 @@ func TestHandleGET(t *testing.T) {
 }
 
 func TestHandleGETS(t *testing.T) {
-	getkvsOld := getkvs
-	defer func() { getkvs = getkvsOld }()
+	getkvOld := getkvs
+	defer func() { getkvs = getkvOld }()
 
 	getkvs = func() ([]string, error) {
 		return nil, nil
