@@ -22,7 +22,27 @@ func HandlePOST(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(&req)
 	}
 
-	err = readConfigsPOSTKVs(body)
+	err = ValidateBody(body)
+
+	if err != nil {
+		req := ResponseStringStruct{Response: string(err.Error())}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(req)
+		return
+	}
+
+	err = KVStruct.ReadConfigs(body)
+
+	if err != nil {
+		req := ResponseStringStruct{Response: string(err.Error())}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(req)
+		return
+	}
+
+	err = KVStruct.WriteKVsToConsul()
 
 	if err != nil {
 		req := ResponseStringStruct{Response: string(err.Error())}
