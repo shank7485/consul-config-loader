@@ -1,14 +1,14 @@
 package api
 
 import (
+	"errors"
 	"github.com/magiconair/properties"
 	"io/ioutil"
 	"path"
 	"runtime"
-	"errors"
 )
 
-func PropertiesFilesToKV(directory string) (map[string]string, error){
+func PropertiesFilesToKV(directory string) (map[string]string, error) {
 	if directory == "default" {
 		kvs := make(map[string]string)
 
@@ -43,14 +43,14 @@ func ReadProperty(path string, kvs map[string]string) {
 	}
 }
 
-func ReadMultipleProperties(path string, kvs map[string]string) (error){
+func ReadMultipleProperties(path string, kvs map[string]string) error {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return err
 	}
 
 	for _, f := range files {
-		ReadProperty(path + f.Name(), kvs)
+		ReadProperty(path+f.Name(), kvs)
 	}
 
 	return nil

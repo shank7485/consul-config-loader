@@ -32,6 +32,22 @@ type TypeStruct struct {
 
 var KVStruct = &KeyValue{kv: make(map[string]string)}
 
+func (kvStruct *KeyValue) ReadConfigs(body LoadStruct) error {
+	if body.Type.FilePath == "default" {
+		err := kvStruct.FileReader("default")
+		if err != nil {
+			return err
+		}
+		return nil
+	} else {
+		err := kvStruct.FileReader(body.Type.FilePath)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+}
+
 func (kvStruct *KeyValue) FileReader(directory string) error {
 	defer kvStruct.Unlock()
 
@@ -58,35 +74,12 @@ func (kvStruct *KeyValue) FileReader(directory string) error {
 	}
 }
 
-func readConfigsPOSTKVs(body LoadStruct) error {
+func ValidateBody(body LoadStruct) error {
 	if body.Type == nil {
 		return errors.New("Type not set. Recheck POST data.")
-	}
-	if body.Type.FilePath == "" {
+	} else if body.Type.FilePath == "" {
 		return errors.New("file_path not set")
-	} else if body.Type.FilePath == "default" {
-		err := KVStruct.FileReader("default")
-		if err != nil {
-			return err
-		}
-
-		err = KVStruct.WriteKVsToConsul()
-		if err != nil {
-			return err
-		}
-
-		return nil
 	} else {
-		err := KVStruct.FileReader(body.Type.FilePath)
-		if err != nil {
-			return err
-		}
-
-		err = KVStruct.WriteKVsToConsul()
-		if err != nil {
-			return err
-		}
-
 		return nil
 	}
 }

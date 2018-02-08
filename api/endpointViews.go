@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-var getkv = GetKVsFromConsul
+var getkvs = GetKVsFromConsul
 
 func HandlePOST(w http.ResponseWriter, r *http.Request) {
 
@@ -20,9 +20,30 @@ func HandlePOST(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(&req)
+		return
 	}
 
-	err = readConfigsPOSTKVs(body)
+	err = ValidateBody(body)
+
+	if err != nil {
+		req := ResponseStringStruct{Response: string(err.Error())}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(req)
+		return
+	}
+
+	err = KVStruct.ReadConfigs(body)
+
+	if err != nil {
+		req := ResponseStringStruct{Response: string(err.Error())}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(req)
+		return
+	}
+
+	err = KVStruct.WriteKVsToConsul()
 
 	if err != nil {
 		req := ResponseStringStruct{Response: string(err.Error())}
@@ -56,7 +77,7 @@ func HandleGET(w http.ResponseWriter, r *http.Request) {
 
 func HandleGETS(w http.ResponseWriter, r *http.Request) {
 
-	values, err := getkv()
+	values, err := getkvs()
 
 	if err != nil {
 		req := ResponseStringStruct{Response: string(err.Error())}
