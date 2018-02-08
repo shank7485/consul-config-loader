@@ -22,7 +22,7 @@ func HandlePOST(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(&req)
 	}
 
-	err = readBody(body)
+	err = readConfigsPOSTKVs(body)
 
 	if err != nil {
 		req := ResponseStringStruct{Response: string(err.Error())}

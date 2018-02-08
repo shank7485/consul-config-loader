@@ -58,7 +58,7 @@ func (kvStruct *KeyValue) FileReader(directory string) error {
 	}
 }
 
-func readBody(body LoadStruct) error {
+func readConfigsPOSTKVs(body LoadStruct) error {
 	if body.Type == nil {
 		return errors.New("Type not set. Recheck POST data.")
 	}
