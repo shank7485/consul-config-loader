@@ -4,11 +4,9 @@
 Post Body example:
 ```
 {
-	"backend_type": "Consul/Cassandra",
-	"properties_source": {
-		"source_type": {
-			"directory/url": "path/url"
-		}
+	"domain": "testing",
+	"type": {
+		"file_path": "default"
 	}
 }
 ```
