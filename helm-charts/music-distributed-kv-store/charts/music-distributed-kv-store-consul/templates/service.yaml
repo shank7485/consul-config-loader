@@ -15,7 +15,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "common.servicename" . }}
+  name: {{ include "common.servicename" . }}-consul
   namespace: {{ include "common.namespace" . }}
   labels:
     app: {{ include "common.fullname" . }}

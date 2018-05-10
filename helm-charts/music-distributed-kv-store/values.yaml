@@ -21,9 +21,8 @@ global:
   persistence: {}
 
 # application image
-repository: docker.io
-image:
-  consul: consul:1.0.6
+repository: nexus3.onap.org:10001
+image: onap/music/distributed-kv-store
 pullPolicy: Always
 
 # flag to enable debugging - application support required
@@ -57,14 +56,14 @@ persistence:
   accessMode: ReadWriteMany
   size: 4Gi
   mountPath: /dockerdata-nfs
-  mountSubPath: /dkv_mount_path/consul_data
+  mountSubPath: dkv_mount_path/configs/
 
 service:
   type: NodePort
-  name: music-dkv-consul
-  PortName: music-dkv-consul
-  internalPort: 8200
-  nodePort: 44
+  name: music-distributed-kv-store
+  portName: music-distributed-kv-store
+  internalPort: 8080
+  nodePort: 49
 
 ingress:
   enabled: false

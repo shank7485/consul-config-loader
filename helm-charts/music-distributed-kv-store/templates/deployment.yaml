@@ -41,8 +41,8 @@ spec:
         - name: DATASTORE
           value: "consul"
         - name: DATASTORE_IP
-          value: "{{ include "common.servicename" . }}-consul"
-        command: ["docker-entrypoint.sh"]
+          value: "music-consul"
+        #command: ["docker-entrypoint.sh"]
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         {{- if eq .Values.liveness.enabled true }}
@@ -60,9 +60,10 @@ spec:
         volumeMounts:
         - mountPath: /dkv_mount_path/configs/
           name: {{ include "common.fullname" . }}-configdata
-        volumes:
-        - name: {{ include "common.fullname" . }}-configdata
-          persistentVolumeClaim:
-            claimName: {{ include "common.fullname" . }}
-        imagePullSecrets:
-        - name: "{{ include "common.namespace" . }}-docker-registry-key"
+      volumes:
+      - name: {{ include "common.fullname" . }}-configdata
+        persistentVolumeClaim:
+          claimName: {{ include "common.fullname" . }}
+      imagePullSecrets:
+      - name: "{{ include "common.namespace" . }}-docker-registry-key"
+
