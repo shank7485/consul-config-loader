@@ -63,8 +63,8 @@ service:
   type: NodePort
   name: music-consul
   PortName: music-consul
-  internalPort: 8200
-  nodePort: 50
+  internalPort: 8500
+  nodePort: 44
 
 ingress:
   enabled: false
